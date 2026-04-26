@@ -20,7 +20,7 @@ A simple AI chatbot application built with Streamlit, LangChain, and OpenAI's GP
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone git@github.com:dannypulickal/ai-chatbot.git
    cd ai-chatbot
    ```
 
