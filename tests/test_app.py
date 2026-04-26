@@ -1,14 +1,21 @@
-import pytest
-from unittest.mock import patch, MagicMock
-from ai_chatbot.app import initialize_chain, display_chat_history, handle_user_input, display_sidebar
+from unittest.mock import MagicMock, patch
+
+from ai_chatbot.app import (
+    display_chat_history,
+    display_sidebar,
+    handle_user_input,
+    initialize_chain,
+)
 
 
-@patch('ai_chatbot.app.st')
-@patch('ai_chatbot.app.ChatOpenAI')
-@patch('ai_chatbot.app.ChatPromptTemplate')
-@patch('ai_chatbot.app.StrOutputParser')
-@patch('ai_chatbot.app.constants')
-def test_initialize_chain(mock_constants, mock_parser, mock_template, mock_llm, mock_st):
+@patch("ai_chatbot.app.st")
+@patch("ai_chatbot.app.ChatOpenAI")
+@patch("ai_chatbot.app.ChatPromptTemplate")
+@patch("ai_chatbot.app.StrOutputParser")
+@patch("ai_chatbot.app.constants")
+def test_initialize_chain(
+    mock_constants, mock_parser, mock_template, mock_llm, mock_st
+):
     # Mock constants
     mock_constants.MODEL = "gpt-4o"
     mock_constants.TEMPERATURE = 0.7
@@ -20,21 +27,22 @@ def test_initialize_chain(mock_constants, mock_parser, mock_template, mock_llm, 
     initialize_chain()
 
     # Assert that chain is set
-    assert hasattr(mock_st.session_state, 'chain')
+    assert hasattr(mock_st.session_state, "chain")
     # Check that the components were called
     mock_llm.assert_called_once()
     mock_template.from_messages.assert_called_once()
     mock_parser.assert_called_once()
 
 
-@patch('ai_chatbot.app.st')
+@patch("ai_chatbot.app.st")
 def test_display_chat_history(mock_st):
     # Mock session_state with chat history
-    from langchain_core.messages import HumanMessage, AIMessage
+    from langchain_core.messages import AIMessage, HumanMessage
+
     mock_st.session_state = MagicMock()
     mock_st.session_state.chat_history = [
         HumanMessage(content="Hello"),
-        AIMessage(content="Hi there")
+        AIMessage(content="Hi there"),
     ]
     mock_st.chat_message = MagicMock()
     mock_st.write = MagicMock()
@@ -49,7 +57,7 @@ def test_display_chat_history(mock_st):
     assert mock_st.write.call_count == 2
 
 
-@patch('ai_chatbot.app.st')
+@patch("ai_chatbot.app.st")
 def test_handle_user_input_no_input(mock_st):
     # Mock no input
     mock_st.chat_input.return_value = None
@@ -63,7 +71,7 @@ def test_handle_user_input_no_input(mock_st):
     assert mock_st.session_state.chat_history == []
 
 
-@patch('ai_chatbot.app.st')
+@patch("ai_chatbot.app.st")
 def test_handle_user_input_with_input(mock_st):
     # Mock input
     mock_st.chat_input.return_value = "Test input"
@@ -86,7 +94,7 @@ def test_handle_user_input_with_input(mock_st):
     mock_chain.invoke.assert_called_once()
 
 
-@patch('ai_chatbot.app.st')
+@patch("ai_chatbot.app.st")
 def test_display_sidebar(mock_st):
     mock_st.sidebar = MagicMock()
     mock_sidebar = MagicMock()

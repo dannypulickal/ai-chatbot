@@ -1,17 +1,19 @@
 import os
+
+import constants
 import streamlit as st
 from dotenv import load_dotenv
-
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import AIMessage, HumanMessage
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
-import constants
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_openai import ChatOpenAI
 
 load_dotenv()
 
+
 def initialize_chain():
-    """Initialize the LangChain conversation chain if not already present in session state.
+    """Initialize the LangChain conversation chain if not already present in 
+    session state.
 
     Creates a ChatOpenAI LLM instance, a ChatPromptTemplate with system message,
     chat history placeholder, and human input, and combines them into a chain
@@ -24,13 +26,16 @@ def initialize_chain():
             api_key=os.getenv("OPENAI_API_KEY"),
         )
 
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", constants.SYSTEM_PROMPT),
-            MessagesPlaceholder(variable_name="chat_history"),
-            ("human", "{input}"),
-        ])
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", constants.SYSTEM_PROMPT),
+                MessagesPlaceholder(variable_name="chat_history"),
+                ("human", "{input}"),
+            ]
+        )
 
         st.session_state.chain = prompt | llm | StrOutputParser()
+
 
 def display_chat_history():
     """Display the chat history in the Streamlit app.
@@ -46,6 +51,7 @@ def display_chat_history():
         elif isinstance(message, AIMessage):
             with st.chat_message("assistant"):
                 st.write(message.content)
+
 
 def handle_user_input():
     """Handle user input for the chatbot.
@@ -64,13 +70,16 @@ def handle_user_input():
 
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
-                response = st.session_state.chain.invoke({
-                    "input": user_input,
-                    "chat_history": st.session_state.chat_history,
-                })
+                response = st.session_state.chain.invoke(
+                    {
+                        "input": user_input,
+                        "chat_history": st.session_state.chat_history,
+                    }
+                )
                 st.write(response)
 
         st.session_state.chat_history.append(AIMessage(content=response))
+
 
 def display_sidebar():
     """Display the sidebar with options and information.
@@ -91,8 +100,10 @@ def display_sidebar():
 
         This module implements a simple AI chatbot using Streamlit for the UI,
         LangChain for conversation management, and OpenAI's GPT-4o model for responses.
-        The app maintains chat history in session state and provides a sidebar for options.
+        The app maintains chat history in session state and provides a sidebar for 
+        options.
         """)
+
 
 def __main__():
     """Main function to run the Streamlit AI chatbot app.
@@ -111,6 +122,7 @@ def __main__():
     display_chat_history()
     handle_user_input()
     display_sidebar()
+
 
 if __name__ == "__main__":
     __main__()
